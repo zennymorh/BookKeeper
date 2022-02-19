@@ -1,6 +1,8 @@
 package com.zennymorh.bookkeeper.di
 
 import android.content.Context
+import com.zennymorh.bookkeeper.data.BookRepository
+import com.zennymorh.bookkeeper.network.ApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,4 +27,12 @@ object AppModule {
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
+
+    @Singleton
+    @Provides
+    fun provideApiService(retrofit: Retrofit): ApiService = retrofit.create(ApiService::class.java)
+
+    @Singleton
+    @Provides
+    fun providesRepository(apiService: ApiService, page: Int) = BookRepository(apiService, page)
 }
