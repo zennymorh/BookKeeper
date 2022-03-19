@@ -2,28 +2,33 @@ package com.zennymorh.bookkeeper.data
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.zennymorh.bookkeeper.model.ApiResponse
+import com.zennymorh.bookkeeper.model.Result
 import java.lang.Exception
+import javax.inject.Inject
 
-class BookSource(private val bookRepository: BookRepository) : PagingSource<Int, ApiResponse.Result>(){
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ApiResponse.Result> {
-        return try {
-            val nextPage = params.key ?: 1
-            val bookListResponse = bookRepository.getBookList()
+class BookSource
+    @Inject constructor(
+        private val bookRepositoryImpl: BookRepositoryImpl
+    ): PagingSource<String, Result>() {
 
-            LoadResult.Page(
-                data = bookListResponse.results,
-                prevKey = if (nextPage == 1) null else nextPage - 1,
-                nextKey = nextPage
-            )
-        } catch (e: Exception) {
-            LoadResult.Error(e)
+        override suspend fun load(params: LoadParams<String>): LoadResult<String, Result> {
+            return try {
+                val keyParams = params.key
+                val page = keyParams?.toInt() ?: 1
+                val bookListResponse = bookRepositoryImpl.getBookList(page)
+
+                LoadResult.Page(
+                    data = bookListResponse.results,
+                    prevKey = bookListResponse.previous,
+                    nextKey = if (bookListResponse.next != null) page.plus(1).toString() else null
+                )
+            } catch (e: Exception) {
+                LoadResult.Error(e)
+            }
         }
+
+        override fun getRefreshKey(state: PagingState<String, Result>): String? {
+            return state.anchorPosition?.let { state.closestItemToPosition(it)?.id }.toString()
+        }
+
     }
-
-    override fun getRefreshKey(state: PagingState<Int, ApiResponse.Result>): Int? {
-        TODO("Not yet implemented")
-    }
-
-
-}

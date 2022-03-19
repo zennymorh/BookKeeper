@@ -1,13 +1,15 @@
 package com.zennymorh.bookkeeper.di
 
-import android.content.Context
+import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.zennymorh.bookkeeper.data.BookRepository
+import com.zennymorh.bookkeeper.data.BookRepositoryImpl
 import com.zennymorh.bookkeeper.network.ApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
@@ -22,10 +24,12 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideRetrofitInstance(BASE_URL: String, @ApplicationContext context: Context): Retrofit =
+    fun provideRetrofitInstance(): Retrofit =
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
+            .addCallAdapterFactory(CoroutineCallAdapterFactory())
+            .client(okhttpClient())
             .build()
 
     @Singleton
@@ -34,5 +38,19 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun providesRepository(apiService: ApiService, page: Int) = BookRepository(apiService, page)
+    fun providesRepositoryImpl(apiService: ApiService): BookRepository
+    = BookRepositoryImpl(apiService)
+
+    @Singleton
+    @Provides
+    fun getLoggingIntercepter() =
+        HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC)
+
+    @Singleton
+    @Provides
+    fun okhttpClient(): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor(getLoggingIntercepter())
+            .build()
+    }
 }
