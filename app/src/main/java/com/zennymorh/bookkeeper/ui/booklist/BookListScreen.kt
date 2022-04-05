@@ -1,7 +1,5 @@
-package com.zennymorh.bookkeeper.booklist
+package com.zennymorh.bookkeeper.ui.booklist
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -9,7 +7,6 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -20,7 +17,6 @@ import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import coil.compose.AsyncImage
-import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
 import com.zennymorh.bookkeeper.ErrorItem
 import com.zennymorh.bookkeeper.LoadingItem
@@ -90,14 +86,15 @@ fun BookList(books: Flow<PagingData<Result>>) {
 @Composable
 fun BookItem(book: Result) {
     Card(shape = RoundedCornerShape(8.dp),
-    elevation = 2.dp,
-    modifier = Modifier) {
+    modifier = Modifier
+        .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 8.dp),
+    elevation = 1.dp) {
         Row(
             modifier = Modifier
-                .padding(start = 16.dp, top = 16.dp, end = 16.dp)
+                .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp)
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+                horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             BookTitle(
                 book.title,
@@ -137,9 +134,19 @@ fun BookImage(
 @Composable
 fun BookTitle(title: String, modifier: Modifier) {
     Text(
-        modifier = modifier,
+        modifier= modifier,
         text = title,
         maxLines = 2,
-        style = MaterialTheme.typography.h6,
+        style = MaterialTheme.typography.body1,
         overflow = TextOverflow.Ellipsis)
+}
+
+@Composable
+fun BookAuthor(author: String) {
+    Text(
+        text = author,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        style = MaterialTheme.typography.subtitle2
+    )
 }
