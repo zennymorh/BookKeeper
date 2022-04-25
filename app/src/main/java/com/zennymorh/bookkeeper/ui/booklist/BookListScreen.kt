@@ -1,5 +1,6 @@
 package com.zennymorh.bookkeeper.ui.booklist
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,6 +13,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -23,10 +25,11 @@ import com.zennymorh.bookkeeper.LoadingItem
 import com.zennymorh.bookkeeper.LoadingView
 import com.zennymorh.bookkeeper.R
 import com.zennymorh.bookkeeper.model.Result
+import com.zennymorh.bookkeeper.navigation.BookListScreens
 import kotlinx.coroutines.flow.Flow
 
 @Composable
-fun BookListScreen(bookListViewModel: BookListViewModel) {
+fun BookListScreen(bookListViewModel: BookListViewModel, navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -34,18 +37,20 @@ fun BookListScreen(bookListViewModel: BookListViewModel) {
             )
         },
         content = {
-            BookList(books = bookListViewModel.bookList)
+            BookList(books = bookListViewModel.bookList, navController = navController, onClick = {bookId -> navController.navigate(BookListScreens.BookDetailScreen.route + "/$bookId")})
         }
     )
 }
 
 @Composable
-fun BookList(books: Flow<PagingData<Result>>) {
+fun BookList(books: Flow<PagingData<Result>>, navController: NavController, onClick: (Int) -> Unit) {
     val lazyBookItems = books.collectAsLazyPagingItems()
 
     LazyColumn {
         items(lazyBookItems) { book ->
-            BookItem(book = book!!)
+            BookItem(book = book!!){
+                onClick(book.id)
+            }
         }
 
         lazyBookItems.apply {
@@ -84,7 +89,7 @@ fun BookList(books: Flow<PagingData<Result>>) {
 }
 
 @Composable
-fun BookItem(book: Result) {
+fun BookItem(book: Result, onClick: () -> Unit) {
     Card(shape = RoundedCornerShape(8.dp),
     modifier = Modifier
         .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 8.dp),
@@ -92,7 +97,8 @@ fun BookItem(book: Result) {
         Row(
             modifier = Modifier
                 .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .clickable(enabled = true, onClick = onClick),
                 horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -106,7 +112,6 @@ fun BookItem(book: Result) {
                     .size(90.dp))
         }
     }
-
 }
 
 @Composable
