@@ -6,6 +6,5 @@ import retrofit2.http.Query
 
 interface ApiService {
     @GET("books")
-    suspend fun getBookList(@Query("page") page: Int)
-    : ApiResponse
+    suspend fun getBookList(@Query("page") page: Int): ApiResponse
 }

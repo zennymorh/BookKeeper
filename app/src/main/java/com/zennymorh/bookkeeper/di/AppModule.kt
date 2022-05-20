@@ -38,8 +38,8 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun providesRepositoryImpl(apiService: ApiService): BookRepository
-    = BookRepositoryImpl(apiService)
+    fun providesRepositoryImpl(apiService: ApiService): BookRepository =
+        BookRepositoryImpl(apiService)
 
     @Singleton
     @Provides
@@ -48,9 +48,9 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun okhttpClient(): OkHttpClient {
-        return OkHttpClient.Builder()
+    fun okhttpClient(): OkHttpClient =
+        OkHttpClient.Builder()
             .addInterceptor(getLoggingIntercepter())
             .build()
-    }
+
 }

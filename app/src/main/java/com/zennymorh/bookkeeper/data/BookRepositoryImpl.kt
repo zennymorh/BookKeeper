@@ -5,10 +5,9 @@ import com.zennymorh.bookkeeper.network.ApiService
 import javax.inject.Inject
 
 class BookRepositoryImpl @Inject constructor(
-    private val apiService: ApiService): BookRepository {
+    private val apiService: ApiService
+) : BookRepository {
 
-    override suspend fun getBookList(page: Int): ApiResponse{
-        return apiService.getBookList(page)
-    }
+    override suspend fun getBookList(page: Int): ApiResponse = apiService.getBookList(page)
 
 }
